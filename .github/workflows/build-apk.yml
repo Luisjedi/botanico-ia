@@ -27,7 +27,10 @@ jobs:
 
       - name: Criar estrutura Android
         run: flutter create . --platforms=android
-
+      - name: Permitir internet no app
+        run: |
+          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+          grep -n "INTERNET" android/app/src/main/AndroidManifest.xml
       - name: Instalar dependências
         run: flutter pub get
 
