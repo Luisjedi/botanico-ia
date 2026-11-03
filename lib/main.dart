@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
         setState(() => error = body['error']?.toString() ?? 'Não foi possível identificar a planta.');
       }
     } catch (e) {
-      setState(() => error = 'Falha de conexão. Verifique a internet e o endereço do serviço.');
+      setState(() => error = 'Erro técnico: $e');
     } finally {
       if (mounted) setState(() => loading = false);
     }
