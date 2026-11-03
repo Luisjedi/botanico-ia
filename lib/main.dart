@@ -59,8 +59,20 @@ class _HomePageState extends State<HomePage> {
     }
     setState(() { loading = true; error = null; identification = null; });
     try {
+      final bytes = await selectedImage!.readAsBytes();
+      final isPng = bytes.length > 4 && bytes[0] == 0x89 && bytes[1] == 0x50;
+      final isJpg = bytes.length > 3 && bytes[0] == 0xFF && bytes[1] == 0xD8;
+      if (!isPng && !isJpg) {
+        setState(() => error = 'Formato não suportado. Use JPG ou PNG.');
+        return;
+      }
       final request = http.MultipartRequest('POST', Uri.parse('$apiBaseUrl/identify'))
-        ..files.add(await http.MultipartFile.fromPath('image', selectedImage!.path));
+        ..files.add(http.MultipartFile.fromBytes(
+          'image',
+          bytes,
+          filename: isPng ? 'foto.png' : 'foto.jpg',
+          contentType: MediaType('image', isPng ? 'png' : 'jpeg'),
+        ));
       final streamed = await request.send().timeout(const Duration(seconds: 60));
       final response = await http.Response.fromStream(streamed);
       final decoded = jsonDecode(response.body);
